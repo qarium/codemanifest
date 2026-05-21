@@ -7,7 +7,7 @@
 или нижнем регистре, ключ должен называться именно так, как показано; любое другое написание должно приводить к ошибке структуры документа.
 
 Внутри папки (далее — ячейка) могут храниться практики (usages), описывающие подходы к работе с ячейкой
-и использованию её API. Практики хранятся внутри ячейки в папке `.usages`, но не являются обязательными.
+и использованию её API. Практики хранятся внутри ячейки в папке `.usages`.
 
 ## Структура ячейки
 
@@ -25,6 +25,8 @@ cell/
 но они не хранят и не являются источником требований к ячейке и её контракту.
 
 ## Пример файла CODEMANIFEST
+
+_Пример в стиле Go._
 
 ```yaml
 Imports:
@@ -44,34 +46,38 @@ Usages:
 Annotations: |
   Use `conventions` for write code.
   Use `testing` for write tests.
+  Use `another_cell_usage` from Imports for additional context.
 
 ---
 
-"example_routine(param: str) -> return_value:str":
+"ParseInput(input string) -> data:[]byte":
+  location: parser.go
   annotations: |
     Description of routine.
 
-    `param`: description of param
+    `input`: description of input
 
     Use `pattern` for implementation
     Next requirements to routine ...
 
-"ExampleEntity(param: str)":
+"HTTPServer(name string)":
+  location: server.go
   annotations: |
     Description of entity.
 
-    `param`: description of param
+    `name`: description of name
 
     Use `pattern` for implementation
+    Use `AnotherCellType` from Imports for data types
     Next requirements to entity ...
   properties:
-    example_property -> str: |
+    "Host -> string": |
       Description of property
   methods:
-    "example_method(method_param: str) -> result:str": |
+    "HandleRequest(req Request) -> resp:Response": |
       Description of method.
 
-      `method_param`: description of method_param
+      `req`: description of req
 
       Use `pattern` for implementation
       Next requirements to method ...
@@ -179,7 +185,7 @@ Imports:
 
 ```yaml
 Usages:
-  library: .goga/usages/importlib.md
+  library: .goga/usages/encoding.md
   structures: http://goga.example/structures.md
   pattern: |
     Usage description here...
@@ -297,16 +303,18 @@ Type():
 
 Должен иметь `methods` и/или `properties`.
 
+_Пример в стиле Swift._
+
 ```yaml
-SomeEntity():
-  location: <file.ext>
+"User(login: String)":
+  location: User.swift
   annotations: |
     ...
   methods:
-    method() -> void:null: |
+    "greet() -> message:String": |
       ...
   properties:
-    name -> str: |
+    "identifier -> Int": |
       ...
 ```
 
@@ -314,13 +322,18 @@ SomeEntity():
 
 Определяют доступные операции.
 
+_Пример в стиле JavaScript._
+
 ```yaml
-SomeEntity():
+ApiClient():
+  location: api.js
+  annotations: |
+    HTTP client for external APIs.
   methods:
-    "method_name(param: str) -> result:str": |
+    "fetchData(endpoint: string) -> response:Promise<string>": |
       this is annotation of method
 
-      `param`: param of method
+      `endpoint`: url to fetch
 ```
 
 Каждый метод:
@@ -332,11 +345,18 @@ SomeEntity():
 
 Определяют свойства типа.
 
+_Пример в стиле Go._
+
 ```yaml
-SomeEntity():
-    properties:
-      name -> int: |
-        What is it?
+Config():
+  location: config.go
+  annotations: |
+    Server configuration.
+  properties:
+    "host -> string": |
+      Server hostname
+    "port -> int64": |
+      Server port
 ```
 
 Каждое свойство:
@@ -348,25 +368,30 @@ SomeEntity():
 
 Процедура (Routine) НЕ имеет `methods` и `properties`; она имеет контракт вида вход -> выход (необязательный, если ничего не возвращается).
 
-```yaml
-"some_routine(param: int) -> number:int": |
-  this is annotation of routine
+_Пример в стиле Python._
 
-  `param`: param of method
+```yaml
+"calculate_total(a: int, b: int) -> total:int":
+  location: calculator.py
+  annotations: |
+    this is annotation of routine
+
+    `a`: first operand
+    `b`: second operand
 ```
 
-В этом примере **number** — это просто семантическая ассоциация типа `int` для лучшего понимания смысла возвращаемого типа.
-**param** — входной параметр типа `int` для конструктора класса, структуры или вызова функции.
+В этом примере **total** — семантическая метка, связанная с типом `int` для лучшего понимания смысла возвращаемого значения.
+**a** и **b** — входные параметры типа `int` для конструктора класса, структуры или вызова функции.
 
 #### Минимальное объявление
 
 Если `methods` и `properties` не указаны, тип рассматривается как вызываемая единица — процедура (функция, функтор — в зависимости от возможностей языка программирования).
 
-Пример:
+_Пример в стиле C++._
 
 ```yaml
-"function(n: int) -> number:int":
-  location: tools.py
+"lookup_entry(std::string key) -> value:int":
+  location: engine.hpp
   annotations: |
     ...
 ```
@@ -486,6 +511,8 @@ Imports:
 
 Аннотации могут ссылаться на практики из `Usages` в заголовке и из `Imports`.
 
+_Пример в стиле Kotlin._
+
 ```yaml
 Imports:
   - Usages:
@@ -503,16 +530,17 @@ Annotations: |
 
 ---
 
-"Object":
+"UserRepository()":
+  location: repository.kt
   annotations: |
     Use `example` from Imports
     Use `pattern` from Usages
   methods:
-    "method() ->void:null": |
+    "findUserById(id: Int) -> user:List<String>": |
       Use `example` from Imports
       Use `pattern` from Usages
   properties:
-    "name -> str": |
+    "tableName -> String": |
       Use `example` from Imports
       Use `pattern` from Usages
 ```
@@ -532,10 +560,12 @@ Annotations: |
 - ссылки должны быть заключены в обратные кавычки, например — \`link_name\`
 - аннотации не должны ссылаться на то, чего нет в контексте текущего файла `CODEMANIFEST`
 
+_Пример в стиле Kotlin._
+
 ```yaml
 Imports:
   - Types:
-      - ObjectOne as Object
+      - ObjectOne AS Object
       - ObjectTwo
     Usages:
       - usage_from_imports
@@ -555,7 +585,8 @@ Annotations: |
 
 ---
 
-Object():
+Repository():
+  location: repository.kt
   annotations: |
     Use `usage_from_imports` from Imports
 
@@ -564,7 +595,7 @@ Object():
     Use `Object` link from imports with alias
     Use `ObjectTwo` link from imports
   methods:
-    "method(param_link: str) -> return_value_link:str": |
+    "findById(userId: Int) -> user:List<String>": |
       Use `usage_from_imports` from Imports
 
       Use `usage_link` in this annotations
@@ -572,10 +603,10 @@ Object():
       Use `Object` link from imports with alias
       Use `ObjectTwo` link from imports
 
-      Use `param_link` in this annotations
-      Use `return_value_link` in this annotations
+      Use `userId` in this annotations
+      Use `user` in this annotations
   properties:
-    "name -> str": |
+    "tableName -> String": |
       Use `usage_from_imports` from Imports
 
       Use `usage_link` in this annotations
@@ -604,7 +635,7 @@ Annotations: |
 
 ```yaml
 Usages:
-  usage_file: path/to/usage.md
+  usage_file: .goga/usages/usage.md
   usage_url: http://usage.url/usage.md
   usage_text: |
     Inline text of usage in document header
@@ -629,6 +660,7 @@ Usages:
 
 ```yaml
 ExampleType():
+  location: types.kt
   annotations: |
     Type annotations here
 ```
@@ -649,13 +681,16 @@ ExampleType():
 
 ### Аннотации свойств и методов
 
+_Пример в стиле Swift._
+
 ```yaml
-ExampleType():
+NetworkManager():
+  location: network.swift
   properties:
-    example_property -> str: |
+    "baseURL -> String": |
       Property annotations here
   methods:
-    example_method(): |
+    "fetchProfile(userId: Int) -> profile:UserProfile": |
       Method annotations here
 ```
 

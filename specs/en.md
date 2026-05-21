@@ -26,6 +26,8 @@ but they do not store and are not the source of requirements for the cell and it
 
 ## CODEMANIFEST File Example
 
+_Example in Go style._
+
 ```yaml
 Imports:
   - Types:
@@ -44,34 +46,38 @@ Usages:
 Annotations: |
   Use `conventions` for write code.
   Use `testing` for write tests.
+  Use `another_cell_usage` from Imports for additional context.
 
 ---
 
-"example_routine(param: str) -> return_value:str":
+"ParseInput(input string) -> data:[]byte":
+  location: parser.go
   annotations: |
     Description of routine.
 
-    `param`: description of param
+    `input`: description of input
 
     Use `pattern` for implementation
     Next requirements to routine ...
 
-"ExampleEntity(param: str)":
+"HTTPServer(name string)":
+  location: server.go
   annotations: |
     Description of entity.
 
-    `param`: description of param
+    `name`: description of name
 
     Use `pattern` for implementation
+    Use `AnotherCellType` from Imports for data types
     Next requirements to entity ...
   properties:
-    example_property -> str: |
+    "Host -> string": |
       Description of property
   methods:
-    "example_method(method_param: str) -> result:str": |
+    "HandleRequest(req Request) -> resp:Response": |
       Description of method.
 
-      `method_param`: description of method_param
+      `req`: description of req
 
       Use `pattern` for implementation
       Next requirements to method ...
@@ -179,7 +185,7 @@ Value formats in the `Usages` section:
 
 ```yaml
 Usages:
-  library: .goga/usages/importlib.md
+  library: .goga/usages/encoding.md
   structures: http://goga.example/structures.md
   pattern: |
     Usage description here...
@@ -297,16 +303,18 @@ This defines the **expected file system structure**, not the implementation meth
 
 Must have `methods` and/or `properties`.
 
+_Example in Swift style._
+
 ```yaml
-SomeEntity():
-  location: <file.ext>
+"User(login: String)":
+  location: User.swift
   annotations: |
     ...
   methods:
-    method() -> void:null: |
+    "greet() -> message:String": |
       ...
   properties:
-    name -> str: |
+    "identifier -> Int": |
       ...
 ```
 
@@ -314,13 +322,18 @@ SomeEntity():
 
 Define available operations.
 
+_Example in JavaScript style._
+
 ```yaml
-SomeEntity():
+ApiClient():
+  location: api.js
+  annotations: |
+    HTTP client for external APIs.
   methods:
-    "method_name(param: str) -> result:str": |
+    "fetchData(endpoint: string) -> response:Promise<string>": |
       this is annotation of method
 
-      `param`: param of method
+      `endpoint`: url to fetch
 ```
 
 Each method:
@@ -332,11 +345,18 @@ Each method:
 
 Define type properties.
 
+_Example in Go style._
+
 ```yaml
-SomeEntity():
-    properties:
-      name -> int: |
-        What is it?
+Config():
+  location: config.go
+  annotations: |
+    Server configuration.
+  properties:
+    "host -> string": |
+      Server hostname
+    "port -> int64": |
+      Server port
 ```
 
 Each property:
@@ -348,25 +368,30 @@ Each property:
 
 A Routine does NOT have `methods` and `properties`; it has a contract of the form input -> output (optional if nothing is returned).
 
-```yaml
-"some_routine(param: int) -> number:int": |
-  this is annotation of routine
+_Example in Python style._
 
-  `param`: param of method
+```yaml
+"calculate_total(a: int, b: int) -> total:int":
+  location: calculator.py
+  annotations: |
+    this is annotation of routine
+
+    `a`: first operand
+    `b`: second operand
 ```
 
-In this example, **number** is simply a semantic association of the `int` type for better understanding of the meaning of the return type.
-**param** is an input parameter of type `int` for a class constructor, structure, or function call.
+In this example, **total** is a semantic label associated with the `int` type for better understanding of the return value's meaning.
+**a** and **b** are input parameters of type `int` for a class constructor, structure, or function call.
 
 #### Minimal Declaration
 
 If `methods` and `properties` are not specified, the type is treated as a callable unit — a procedure (function, functor — depending on the capabilities of the programming language).
 
-Example:
+_Example in C++ style._
 
 ```yaml
-"function(n: int) -> number:int":
-  location: tools.py
+"lookup_entry(std::string key) -> value:int":
+  location: engine.hpp
   annotations: |
     ...
 ```
@@ -486,6 +511,8 @@ These are not descriptions of "what something is", but directives about:
 
 Annotations can reference usages from `Usages` in the header and from `Imports`.
 
+_Example in Kotlin style._
+
 ```yaml
 Imports:
   - Usages:
@@ -503,16 +530,17 @@ Annotations: |
 
 ---
 
-"Object":
+"UserRepository()":
+  location: repository.kt
   annotations: |
     Use `example` from Imports
     Use `pattern` from Usages
   methods:
-    "method() ->void:null": |
+    "findUserById(id: Int) -> user:List<String>": |
       Use `example` from Imports
       Use `pattern` from Usages
   properties:
-    "name -> str": |
+    "tableName -> String": |
       Use `example` from Imports
       Use `pattern` from Usages
 ```
@@ -532,10 +560,12 @@ Restrictions:
 - references must be enclosed in backticks, for example — \`link_name\`
 - annotations must not reference anything that is not in the context of the current `CODEMANIFEST` file
 
+_Example in Kotlin style._
+
 ```yaml
 Imports:
   - Types:
-      - ObjectOne as Object
+      - ObjectOne AS Object
       - ObjectTwo
     Usages:
       - usage_from_imports
@@ -555,7 +585,8 @@ Annotations: |
 
 ---
 
-Object():
+Repository():
+  location: repository.kt
   annotations: |
     Use `usage_from_imports` from Imports
 
@@ -564,7 +595,7 @@ Object():
     Use `Object` link from imports with alias
     Use `ObjectTwo` link from imports
   methods:
-    "method(param_link: str) -> return_value_link:str": |
+    "findById(userId: Int) -> user:List<String>": |
       Use `usage_from_imports` from Imports
 
       Use `usage_link` in the annotations
@@ -572,10 +603,10 @@ Object():
       Use `Object` link from imports with alias
       Use `ObjectTwo` link from imports
 
-      Use `param_link` in the annotations
-      Use `return_value_link` in the annotations
+      Use `userId` in the annotations
+      Use `user` in the annotations
   properties:
-    "name -> str": |
+    "tableName -> String": |
       Use `usage_from_imports` from Imports
 
       Use `usage_link` in the annotations
@@ -604,7 +635,7 @@ Apply to the entire document.
 
 ```yaml
 Usages:
-  usage_file: path/to/usage.md
+  usage_file: .goga/usages/usage.md
   usage_url: http://usage.url/usage.md
   usage_text: |
     Inline text of usage in document header
@@ -629,6 +660,7 @@ They define:
 
 ```yaml
 ExampleType():
+  location: types.kt
   annotations: |
     Type annotations here
 ```
@@ -649,13 +681,16 @@ They can:
 
 ### Property and Method Annotations
 
+_Example in Swift style._
+
 ```yaml
-ExampleType():
+NetworkManager():
+  location: network.swift
   properties:
-    example_property -> str: |
+    "baseURL -> String": |
       Property annotations here
   methods:
-    example_method(): |
+    "fetchProfile(userId: Int) -> profile:UserProfile": |
       Method annotations here
 ```
 
