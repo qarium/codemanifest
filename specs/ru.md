@@ -26,8 +26,6 @@ cell/
 
 ## Пример файла CODEMANIFEST
 
-_Пример в стиле Go._
-
 ```yaml
 Imports:
   - Types:
@@ -50,8 +48,8 @@ Annotations: |
 
 ---
 
-"ParseInput(input string) -> data:[]byte":
-  location: parser.go
+"ParseInput(input: string) -> data:List<byte>":
+  location: parser.<ext>
   annotations: |
     Description of routine.
 
@@ -60,8 +58,8 @@ Annotations: |
     Use `pattern` for implementation
     Next requirements to routine ...
 
-"HTTPServer(name string)":
-  location: server.go
+"HTTPServer(name: String)":
+  location: server.<ext>
   annotations: |
     Description of entity.
 
@@ -71,10 +69,10 @@ Annotations: |
     Use `AnotherCellType` from Imports for data types
     Next requirements to entity ...
   properties:
-    "Host -> string": |
+    "host -> String": |
       Description of property
   methods:
-    "HandleRequest(req Request) -> resp:Response": |
+    "handleRequest(req: Request) -> resp:Response": |
       Description of method.
 
       `req`: description of req
@@ -303,11 +301,9 @@ Type():
 
 Должен иметь `methods` и/или `properties`.
 
-_Пример в стиле Swift._
-
 ```yaml
 "User(login: String)":
-  location: User.swift
+  location: User.<ext>
   annotations: |
     ...
   methods:
@@ -322,11 +318,9 @@ _Пример в стиле Swift._
 
 Определяют доступные операции.
 
-_Пример в стиле JavaScript._
-
 ```yaml
 ApiClient():
-  location: api.js
+  location: api.<ext>
   annotations: |
     HTTP client for external APIs.
   methods:
@@ -345,11 +339,9 @@ ApiClient():
 
 Определяют свойства типа.
 
-_Пример в стиле Go._
-
 ```yaml
 Config():
-  location: config.go
+  location: config.<ext>
   annotations: |
     Server configuration.
   properties:
@@ -368,11 +360,9 @@ Config():
 
 Процедура (Routine) НЕ имеет `methods` и `properties`; она имеет контракт вида вход -> выход (необязательный, если ничего не возвращается).
 
-_Пример в стиле Python._
-
 ```yaml
 "calculate_total(a: int, b: int) -> total:int":
-  location: calculator.py
+  location: calculator.<ext>
   annotations: |
     this is annotation of routine
 
@@ -387,11 +377,9 @@ _Пример в стиле Python._
 
 Если `methods` и `properties` не указаны, тип рассматривается как вызываемая единица — процедура (функция, функтор — в зависимости от возможностей языка программирования).
 
-_Пример в стиле C++._
-
 ```yaml
 "lookup_entry(std::string key) -> value:int":
-  location: engine.hpp
+  location: engine.<ext>
   annotations: |
     ...
 ```
@@ -511,8 +499,6 @@ Imports:
 
 Аннотации могут ссылаться на практики из `Usages` в заголовке и из `Imports`.
 
-_Пример в стиле Kotlin._
-
 ```yaml
 Imports:
   - Usages:
@@ -531,7 +517,7 @@ Annotations: |
 ---
 
 "UserRepository()":
-  location: repository.kt
+  location: repository.<ext>
   annotations: |
     Use `example` from Imports
     Use `pattern` from Usages
@@ -560,8 +546,6 @@ Annotations: |
 - ссылки должны быть заключены в обратные кавычки, например — \`link_name\`
 - аннотации не должны ссылаться на то, чего нет в контексте текущего файла `CODEMANIFEST`
 
-_Пример в стиле Kotlin._
-
 ```yaml
 Imports:
   - Types:
@@ -586,7 +570,7 @@ Annotations: |
 ---
 
 Repository():
-  location: repository.kt
+  location: repository.<ext>
   annotations: |
     Use `usage_from_imports` from Imports
 
@@ -660,7 +644,7 @@ Usages:
 
 ```yaml
 ExampleType():
-  location: types.kt
+  location: types.<ext>
   annotations: |
     Type annotations here
 ```
@@ -681,11 +665,9 @@ ExampleType():
 
 ### Аннотации свойств и методов
 
-_Пример в стиле Swift._
-
 ```yaml
 NetworkManager():
-  location: network.swift
+  location: network.<ext>
   properties:
     "baseURL -> String": |
       Property annotations here

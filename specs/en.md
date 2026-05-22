@@ -26,8 +26,6 @@ but they do not store and are not the source of requirements for the cell and it
 
 ## CODEMANIFEST File Example
 
-_Example in Go style._
-
 ```yaml
 Imports:
   - Types:
@@ -50,8 +48,8 @@ Annotations: |
 
 ---
 
-"ParseInput(input string) -> data:[]byte":
-  location: parser.go
+"ParseInput(input: string) -> data:List<byte>":
+  location: parser.<ext>
   annotations: |
     Description of routine.
 
@@ -60,8 +58,8 @@ Annotations: |
     Use `pattern` for implementation
     Next requirements to routine ...
 
-"HTTPServer(name string)":
-  location: server.go
+"HTTPServer(name: String)":
+  location: server.<ext>
   annotations: |
     Description of entity.
 
@@ -71,10 +69,10 @@ Annotations: |
     Use `AnotherCellType` from Imports for data types
     Next requirements to entity ...
   properties:
-    "Host -> string": |
+    "host -> String": |
       Description of property
   methods:
-    "HandleRequest(req Request) -> resp:Response": |
+    "handleRequest(req: Request) -> resp:Response": |
       Description of method.
 
       `req`: description of req
@@ -303,11 +301,9 @@ This defines the **expected file system structure**, not the implementation meth
 
 Must have `methods` and/or `properties`.
 
-_Example in Swift style._
-
 ```yaml
 "User(login: String)":
-  location: User.swift
+  location: User.<ext>
   annotations: |
     ...
   methods:
@@ -322,11 +318,9 @@ _Example in Swift style._
 
 Define available operations.
 
-_Example in JavaScript style._
-
 ```yaml
 ApiClient():
-  location: api.js
+  location: api.<ext>
   annotations: |
     HTTP client for external APIs.
   methods:
@@ -345,11 +339,9 @@ Each method:
 
 Define type properties.
 
-_Example in Go style._
-
 ```yaml
 Config():
-  location: config.go
+  location: config.<ext>
   annotations: |
     Server configuration.
   properties:
@@ -368,11 +360,9 @@ Each property:
 
 A Routine does NOT have `methods` and `properties`; it has a contract of the form input -> output (optional if nothing is returned).
 
-_Example in Python style._
-
 ```yaml
 "calculate_total(a: int, b: int) -> total:int":
-  location: calculator.py
+  location: calculator.<ext>
   annotations: |
     this is annotation of routine
 
@@ -387,11 +377,9 @@ In this example, **total** is a semantic label associated with the `int` type fo
 
 If `methods` and `properties` are not specified, the type is treated as a callable unit — a procedure (function, functor — depending on the capabilities of the programming language).
 
-_Example in C++ style._
-
 ```yaml
 "lookup_entry(std::string key) -> value:int":
-  location: engine.hpp
+  location: engine.<ext>
   annotations: |
     ...
 ```
@@ -511,8 +499,6 @@ These are not descriptions of "what something is", but directives about:
 
 Annotations can reference usages from `Usages` in the header and from `Imports`.
 
-_Example in Kotlin style._
-
 ```yaml
 Imports:
   - Usages:
@@ -531,7 +517,7 @@ Annotations: |
 ---
 
 "UserRepository()":
-  location: repository.kt
+  location: repository.<ext>
   annotations: |
     Use `example` from Imports
     Use `pattern` from Usages
@@ -560,8 +546,6 @@ Restrictions:
 - references must be enclosed in backticks, for example — \`link_name\`
 - annotations must not reference anything that is not in the context of the current `CODEMANIFEST` file
 
-_Example in Kotlin style._
-
 ```yaml
 Imports:
   - Types:
@@ -586,7 +570,7 @@ Annotations: |
 ---
 
 Repository():
-  location: repository.kt
+  location: repository.<ext>
   annotations: |
     Use `usage_from_imports` from Imports
 
@@ -660,7 +644,7 @@ They define:
 
 ```yaml
 ExampleType():
-  location: types.kt
+  location: types.<ext>
   annotations: |
     Type annotations here
 ```
@@ -681,11 +665,9 @@ They can:
 
 ### Property and Method Annotations
 
-_Example in Swift style._
-
 ```yaml
 NetworkManager():
-  location: network.swift
+  location: network.<ext>
   properties:
     "baseURL -> String": |
       Property annotations here
