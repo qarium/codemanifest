@@ -1,13 +1,11 @@
 # DSL Specification
 
-A DSL document (manifest) must be located in the folder whose interface it describes.
-The folder is called a cell. The manifest file name is strictly fixed — `CODEMANIFEST`.
+A DSL document (manifest) resides in the directory whose interface it describes.
+The directory is called a **cell**. The manifest filename is fixed as `CODEMANIFEST`.
 
-Case sensitivity of keys in the `yaml` document is **IMPORTANT**: if the specification provides examples with a key in uppercase
-or lowercase, the key must be named exactly as shown; any other spelling must result in a document structure error.
+YAML key casing is **case-sensitive**: keys must appear in the exact casing shown in this specification. Any deviation constitutes a structural error.
 
-Inside the folder (hereinafter — cell), usage practices (usages) may be stored, describing approaches to working with the cell
-and using its API. Usages are stored inside the cell in the `.usages` folder, but are not required.
+A cell may contain **practices** (usages) — documentation files that describe how to work with the cell and consume its API. Practices reside in the `.usages` directory within the cell.
 
 ## Cell Structure
 
@@ -17,12 +15,11 @@ cell/
 └── .usages/*.md
 ```
 
-* cell — folder whose name is the cell name
-* CODEMANIFEST — yaml DSL describing the API contract
-* .usages — folder containing usages that describe how to work with the cell
+* cell — directory named after the cell
+* CODEMANIFEST — YAML DSL describing the API contract
+* .usages — directory containing practices for working with the cell
 
-**IMPORTANT**: each cell stores its usage descriptions in `.usages`, which explain how to use the cell,
-but they do not store and are not the source of requirements for the cell and its contract.
+**IMPORTANT**: each cell stores its practices in `.usages`. Practices explain how to consume the cell; they do not define requirements for the cell or its contract.
 
 ## CODEMANIFEST File Example
 
@@ -90,45 +87,44 @@ Description: |
 
 ## CODEMANIFEST Document Structure
 
-The DSL describes the **cell contract** — a set of types and their expected API, independent of a specific
-programming language or implementation method, based on `yaml`.
+The DSL defines a **cell contract** — a language-agnostic set of types and their expected API, expressed in YAML.
 
-The document is divided into three logical parts:
+The document consists of three logical sections:
 
-1. **Header (meta-level)** — sets the context:
-   - type sources (`Imports`)
-   - used usages (`Usages`)
-   - global directives (`Annotations`)
+1. **Header** (meta-level) — establishes context:
+   - Type sources (`Imports`)
+   - Practices (`Usages`)
+   - Global directives (`Annotations`)
 
-2. **Body (contract description)** — type declarations and their expected behavior
+2. **Body** (contract definition) — type declarations and their expected behavior
 
-3. **Footer (meta-level)** — defines additional meta-information that does not affect the contract architecture:
-   - author name (`Author`)
-   - document creation date (`CreatedAt`)
-   - manifest description (`Description`)
+3. **Footer** (meta-level) — metadata that does not affect the contract architecture:
+   - Author name (`Author`)
+   - Creation date (`CreatedAt`)
+   - Manifest description (`Description`)
 
-The separation is done according to the `yaml` standard using:
+Sections are separated using the YAML document marker:
 
 ```yaml
 ---
 ```
 
-The order of parts is **IMPORTANT**:
+The section order is **mandatory**:
 1. Header
 2. Body
 3. Footer
 
-**IMPORTANT**: the document does not describe *how exactly to implement the code*, but fixes the **expectations from the API and behavior** that need to be implemented.
+**IMPORTANT**: the document does not prescribe *how* to implement the code. It specifies **the API and behavioral expectations** that the implementation must satisfy.
 
 ---
 
 ### Header
 
-The header sets the context in which the entire file should be interpreted.
+The Header defines the interpretation context for the entire file.
 
-#### Importing Types and Usages
+#### Importing Types and Practices
 
-Types from other files are connected via `Imports` and then used in the document body.
+Types from other cells are brought in via `Imports` and referenced throughout the body.
 
 ```yaml
 Imports:
@@ -141,45 +137,44 @@ Imports:
     From: path/to/cell
 ```
 
-This connects available types and usages within the project.
+Connects types and practices available within the project.
 
-- `Types` — list of names of imported types
-- `Usages` — list of names of imported usages
-- `From` — source (folder relative to the working directory where the `CODEMANIFEST` file is located)
-- The syntax `ObjectTwo AS Object` means that `ObjectTwo` is imported with the alias `Object`
+- `Types` — list of type names to import
+- `Usages` — list of practice names to import
+- `From` — source path (directory relative to the working directory containing the `CODEMANIFEST` file)
+- The `ObjectTwo AS Object` syntax imports `ObjectTwo` under the alias `Object`
 
-**Case is important**.
+**Casing is significant.**
 
-Imported types can:
-- be used in declared interfaces
-- be mutated and extended
-- be embedded into the current contract
+Imported types may:
+- Appear in declared interfaces
+- Undergo mutation and extension
+- Be embedded into the current contract
 
-Imported usages:
-- are located in the source cell's folder at the path `{From}/.usages/`
-- are imported by file name without the `.md` extension; the full file path is `{From}/.usages/{name}.md`
-- create a **tracked dependency** — when a usage changes, consumers are found through the import graph
-- do **not** create contractual obligations — they remain at the documentation level for the consumer
-- must not have names conflicting with current `Usages` in the document header (conflicts are resolved by creating an alias in `Imports`)
+Imported practices:
+- Reside in the source cell at `{From}/.usages/`
+- Are referenced by filename without the `.md` extension; the full path resolves to `{From}/.usages/{name}.md`
+- Establish a **tracked dependency** — when a practice changes, consumers are identified through the import graph
+- **Do not** create contractual obligations — they serve as documentation for the consumer
+- Must not conflict with local `Usages` keys in the document header (resolve conflicts via the `AS` alias in `Imports`)
 
 Restrictions:
-- Imports cannot be cross-referenced between cells, meaning cell `A` cannot import a type/usage from cell `B` if cell `B` imports a type from cell `A`
+- Cross-imports between cells are prohibited: cell `A` cannot import from cell `B` if cell `B` imports from cell `A`
 
-#### Usages
+#### Practices (Usages)
 
-`Usages` — a directive in the CODEMANIFEST header that defines a named set of usages for use
-in the annotations of the current document.
+`Usages` is a header directive that declares a named set of practices for reference in the document's annotations.
 
-A usage is documentation that can be about:
-- a library
-- a pattern
-- a convention
-- or any specification
+A practice is documentation covering one of the following:
+- A library
+- A design pattern
+- A convention
+- Any specification
 
-Value formats in the `Usages` section:
-- path to an md-file, relative to the project root (the file must be located in `.goga/usages/`)
-- URL
-- inline description
+Values in the `Usages` section accept:
+- A path to an md file, relative to the project root (must reside in `.goga/usages/`)
+- A URL
+- An inline description
 
 ```yaml
 Usages:
@@ -189,25 +184,24 @@ Usages:
     Usage description here...
 ```
 
-The **key** is the usage name for references in annotations using backticks, for example `pattern`.
+The **key** serves as the practice identifier for backtick references in annotations, e.g., `pattern`.
 
-Usages are connected in two ways:
+Practices are connected through two mechanisms:
 
-1. **Declaration** in the `Usages` section — the usage is described by its value
-2. **Import** via the `Imports` section — the usage is imported from the `.usages/` directory of another cell
-   by file name without the `.md` extension. Import creates a tracked dependency but not a contractual obligation.
+1. **Declaration** in the `Usages` section — the practice is defined by its value
+2. **Import** via the `Imports` section — the practice is imported from another cell's `.usages/` directory by filename without the `.md` extension. Import establishes a tracked dependency without creating a contractual obligation.
 
-**IMPORTANT**: usages cannot directly bind to contract interfaces. They provide only context — informing the executing agent about external resources and how to work with them.
+**IMPORTANT**: practices cannot bind directly to contract interfaces. They provide context only — informing the implementing agent about external resources and how to work with them.
 
 #### Annotations
 
-Global directives for the agent.
+Global directives addressed to the implementing agent.
 
-These are:
-- implementation requirements
-- constraints
-- architectural expectations
-- hints on using usages
+They convey:
+- Implementation requirements
+- Constraints
+- Architectural expectations
+- Practice application hints
 
 They apply to the entire document.
 
@@ -220,9 +214,9 @@ Annotations: |
 
 ### Body
 
-The body describes **contract types** — what API elements should exist and how they should behave.
+The body defines **contract types** — which API elements must exist and how they must behave.
 
-Three main constructs are used:
+Three constructs are available:
 
 1. Type declaration
 2. Type embedding
@@ -230,21 +224,21 @@ Three main constructs are used:
 
 #### Types
 
-A type in the DSL is an abstract unit of API.
+A type in the DSL is an abstract API unit.
 
-It can be:
-- a class
-- a structure
-- an object
-- a function
-- a service
-- any other entity
+It may represent:
+- A class
+- A structure
+- An object
+- A function
+- A service
+- Any other entity
 
-The DSL does not fix the implementation form — only the expected contract.
+The DSL does not prescribe an implementation form — only the expected contract.
 
 #### Type Declaration
 
-A type is defined by its signature:
+A type is declared by its signature:
 
 ```yaml
 "<Name><Signature>":
@@ -269,17 +263,17 @@ A type is defined by its signature:
        ...
 ```
 
-The signature is written in free form, close to programming languages, which an LLM can easily associate with code.
+The signature uses free-form notation close to programming language syntax, enabling an LLM to map it directly to code.
 
 It:
-- describes the API shape
-- helps the agent understand the expected model
-- does not require strict formal grammar
+- Describes the API shape
+- Helps the agent understand the expected model
+- Does not require a strict formal grammar
 
 Basic requirements:
-* The signature describes the input and output of the contract
-* Input and output must have the specified data type
-* The output type is associated with a variable/label to convey the semantic meaning of the return value with the specified data type
+* The signature describes the contract's input and output
+* Input and output must specify a data type
+* The output type is paired with a variable/label that conveys the semantic meaning of the returned value
 
 ##### location
 
@@ -288,18 +282,18 @@ Type():
   location: file.ext
 ```
 
-Specifies the logical placement of the type relative to the root of the current directory in file name format.
+Specifies the logical file placement relative to the current directory root, in filename format.
 
 Restrictions:
-* The file must be at the same level as `CODEMANIFEST`
+* The file must reside at the same directory level as `CODEMANIFEST`
 * The file must include an extension
-* The path cannot go up a level or descend into subdirectories
+* The path must not traverse parent directories or descend into subdirectories
 
-This defines the **expected file system structure**, not the implementation method.
+This defines the **expected filesystem structure**, not the implementation method.
 
 #### Entity Type
 
-Must have `methods` and/or `properties`.
+An Entity must have `methods` and/or `properties`.
 
 ```yaml
 "User(login: String)":
@@ -316,7 +310,7 @@ Must have `methods` and/or `properties`.
 
 ##### Methods
 
-Define available operations.
+Define the available operations.
 
 ```yaml
 ApiClient():
@@ -331,13 +325,13 @@ ApiClient():
 ```
 
 Each method:
-- has a unique name within the entity
-- is defined by its signature
-- is accompanied by an annotation
+- Has a unique name within the entity
+- Is defined by its signature
+- Is accompanied by an annotation
 
 ##### Properties
 
-Define type properties.
+Define the type's data fields.
 
 ```yaml
 Config():
@@ -352,13 +346,13 @@ Config():
 ```
 
 Each property:
-- has a unique name within the entity
-- specifies the data type of the return value
-- is accompanied by an annotation
+- Has a unique name within the entity
+- Specifies the data type of the return value
+- Is accompanied by an annotation
 
 #### Routine Type
 
-A Routine does NOT have `methods` and `properties`; it has a contract of the form input -> output (optional if nothing is returned).
+A Routine has no `methods` or `properties`. Its contract follows an input → output form (output is optional when nothing is returned).
 
 ```yaml
 "calculate_total(a: int, b: int) -> total:int":
@@ -370,12 +364,12 @@ A Routine does NOT have `methods` and `properties`; it has a contract of the for
     `b`: second operand
 ```
 
-In this example, **total** is a semantic label associated with the `int` type for better understanding of the return value's meaning.
-**a** and **b** are input parameters of type `int` for a class constructor, structure, or function call.
+In this example, **total** is a semantic label paired with the `int` type to clarify the meaning of the return value.
+**a** and **b** are input parameters of type `int` for a class constructor, struct, or function call.
 
 #### Minimal Declaration
 
-If `methods` and `properties` are not specified, the type is treated as a callable unit — a procedure (function, functor — depending on the capabilities of the programming language).
+When `methods` and `properties` are absent, the type is treated as a callable unit — a procedure (function, functor, etc., depending on language capabilities).
 
 ```yaml
 "lookup_entry(std::string key) -> value:int":
@@ -384,55 +378,53 @@ If `methods` and `properties` are not specified, the type is treated as a callab
     ...
 ```
 
-The DSL does not fix the implementation form — only the expected contract.
+The DSL does not prescribe the implementation form — only the expected contract.
 
 #### Type Mutation
 
-The following form is used for type mutation:
+Type mutation uses the following syntax:
 
 ```yaml
 "Object::SomeClass()":
   ...
 ```
 
-This means:
+This denotes:
+- Source type: `Object`
+- Target form: `SomeClass`
 
-- source type `Object`
-- target form `SomeClass`
+Key points:
+- The DSL does not define the mutation mechanism
+- Mutation may be realized through:
+  - Inheritance
+  - Composition
+  - Adapter pattern
+  - Interface implementation
+  - Decorator pattern
+  - Any other strategy
 
-Important:
-- the DSL does not define the mutation mechanism
-- it can be:
-  - inheritance
-  - composition
-  - adapter
-  - interface implementation
-  - decoration
-  - or any other strategy
+The specification fixes only the fact:
+**a type exists that represents a concretization of the base type and its extension**
 
-Only the fact is fixed:
-**there exists a type that represents a concretization of the base type and its extension**
+For routines, mutation may indicate that the user wants the same outcome with a different signature and modified logic. This notation may require:
+- Extension via decoration
+- Complete replacement of the original logic
+- Any other strategy
 
-For procedures, mutation can mean that the user wants to achieve the same result,
-but with a different signature and modified logic; this notation can require:
-- extension through decoration
-- complete replacement of the original logic
-- or any other strategy
-
-The number of types for mutation is not limited.
+The number of types involved in mutation is unbounded.
 
 ```yaml
 "ObjectOne::ObjectTwo::SomeClass()":
   ...
 ```
 
-Semantically, this means that `SomeClass` must be a mutation of both `ObjectOne` and `ObjectTwo`.
+Semantically, `SomeClass` must be a mutation of both `ObjectOne` and `ObjectTwo`.
 
 ---
 
 ### Footer
 
-The footer is optional and describes the manifest metadata.
+The footer is optional and specifies manifest metadata.
 
 ```yaml
 Author: FirstName SecondName
@@ -445,31 +437,27 @@ Description: |
 Fields:
 - `Author`: first and last name of the manifest author
 - `CreatedAt`: manifest creation date
-- `Description`: manifest description
+- `Description`: description of the manifest
 
 ---
 
 ## usages/ Directory
 
-Usages are stored at two levels:
+Practices reside at two levels:
 
-**Project level** — the `.goga/usages/` directory in the project root. Common usages not tied to a specific cell:
-libraries, tools, conventions. Connected via a path in the `Usages` directive in CODEMANIFEST.
-Project-level usages **can only be located** in `.goga/usages/`.
+**Project level** — the `.goga/usages/` directory at the project root. Contains shared practices not bound to a specific cell: libraries, tools, conventions. Referenced by path in the `Usages` directive of CODEMANIFEST. Project-level practices **must reside exclusively** in `.goga/usages/`.
 
-**Cell level** — the `.usages/` directory inside a cell. Usages for consumers of a specific cell's API:
-how to work with the cell facade, which patterns to apply. Consumers connect them via `Imports`,
-referencing the cell provider.
+**Cell level** — the `.usages/` directory inside a cell. Contains practices for consumers of a specific cell's API: how to work with the cell facade, which patterns to apply. Consumers connect them through `Imports`, referencing the provider cell.
 
 ---
 
 ## Type Embedding
 
-Embedding means including a type in the current contract.
+Embedding includes a type in the current contract.
 
 Restrictions:
-- the type must be available via `Imports`
-- embedding from `Usages` is not recommended
+- The type must be available via `Imports`
+- Embedding from `Usages` is not recommended
 
 ```yaml
 Imports:
@@ -482,22 +470,21 @@ Imports:
 ->Entity: {}
 ```
 
-Semantically, this means including the imported type (`Entity`) in the current contract.
+Semantically, this includes the imported type (`Entity`) into the current contract.
 
 ---
 
 ## Annotations
 
-Annotations are the key mechanism for controlling generation.
+Annotations are the primary mechanism for controlling code generation.
 
-These are not descriptions of "what something is", but directives about:
+They are not descriptions of "what something is" — they are directives specifying:
+- Expected output
+- API behavior requirements
+- Which practices to apply
+- Which constraints to enforce
 
-- what is expected as output
-- how the API should behave
-- which usages to apply
-- which constraints to follow
-
-Annotations can reference usages from `Usages` in the header and from `Imports`.
+Annotations may reference practices from both the header `Usages` and `Imports`.
 
 ```yaml
 Imports:
@@ -533,18 +520,16 @@ Annotations: |
 
 ### Using References
 
-A reference is an identifier in backticks inside an annotation (e.g., `param`) that points to
-a named element of the document: a variable from the signature, a type, or a usage. A reference links the annotation text
-to a specific entity from the context of the current `CODEMANIFEST`.
+A reference is a backtick-enclosed identifier within an annotation (e.g., `param`) that points to a named document element: a signature variable, a type, or a practice. A reference binds the annotation text to a specific entity within the current `CODEMANIFEST` context.
 
-References can be to:
-- variables in the signature
-- any types present in the context of the current `CODEMANIFEST` file, including those in `Imports`
-- usages in `Usages` and `Imports`
+References may target:
+- Signature variables
+- Any type in the current `CODEMANIFEST` file context, including those from `Imports`
+- Practices in `Usages` and `Imports`
 
 Restrictions:
-- references must be enclosed in backticks, for example — \`link_name\`
-- annotations must not reference anything that is not in the context of the current `CODEMANIFEST` file
+- References must be enclosed in backticks, e.g., `link_name`
+- Annotations must not reference entities outside the current `CODEMANIFEST` file context
 
 ```yaml
 Imports:
@@ -562,7 +547,7 @@ Usages:
 Annotations: |
   Use `usage_from_imports` from Imports
 
-  Use `usage_link` in the annotations
+  Use `usage_link` in this annotations
 
   Use `ObjectTwo` link from imports
   Use `Object` link from imports with alias
@@ -574,7 +559,7 @@ Repository():
   annotations: |
     Use `usage_from_imports` from Imports
 
-    Use `usage_link` in the annotations
+    Use `usage_link` in this annotations
 
     Use `Object` link from imports with alias
     Use `ObjectTwo` link from imports
@@ -582,18 +567,18 @@ Repository():
     "findById(userId: Int) -> user:List<String>": |
       Use `usage_from_imports` from Imports
 
-      Use `usage_link` in the annotations
+      Use `usage_link` in this annotations
 
       Use `Object` link from imports with alias
       Use `ObjectTwo` link from imports
 
-      Use `userId` in the annotations
-      Use `user` in the annotations
+      Use `userId` in this annotations
+      Use `user` in this annotations
   properties:
     "tableName -> String": |
       Use `usage_from_imports` from Imports
 
-      Use `usage_link` in the annotations
+      Use `usage_link` in this annotations
 
       Use `Object` link from imports with alias
       Use `ObjectTwo` link from imports
@@ -606,16 +591,16 @@ Annotations: |
   Global annotations in document header
 ```
 
-Define the general context:
+Establish shared context:
 
-- used libraries
-- implementation principles
-- execution features
-- etc.
+- Libraries in use
+- Implementation principles
+- Execution specifics
+- And so forth
 
-Apply to the entire document.
+Applied to the entire document.
 
-### Usage Annotations
+### Practice Annotations
 
 ```yaml
 Usages:
@@ -625,18 +610,18 @@ Usages:
     Inline text of usage in document header
 ```
 
-Usages can be described as:
+Practices may be specified as:
 
-- path to an md-file
-- URL
-- inline text
+- A path to an md file
+- A URL
+- Inline text
 
 They define:
-- how to implement
-- how to use
-- which approaches to apply
-- which constraints to consider
-- etc.
+- How to implement
+- How to consume
+- Which approaches to apply
+- Which constraints to account for
+- And so forth
 
 ---
 
@@ -649,17 +634,17 @@ ExampleType():
     Type annotations here
 ```
 
-Define expectations from the type entity:
+Specify expectations for the type:
 
-- behavior
-- purpose
-- rules of operation
-- interaction with other entities
+- Behavior
+- Purpose
+- Operational rules
+- Interaction with other entities
 
-They can:
-- clarify the signature
-- introduce requirements
-- reference usages
+They may:
+- Clarify the signature
+- Introduce requirements
+- Reference practices
 
 ---
 
@@ -676,26 +661,26 @@ NetworkManager():
       Method annotations here
 ```
 
-Used to clarify:
+Provide specifics on:
 
-- operation logic
-- data structure
-- result format
-- processing rules
+- Operation logic
+- Data structure
+- Result format
+- Processing rules
 
-This is not a description, but a **behavior contract** that must be implemented.
-
----
-
-## Usages
-
-Usages are a layer of documentation for consumers of a cell's API.
-
-They do not create entities, but describe how to work with the cell facade.
+These are not descriptions — they constitute a **behavioral contract** that must be implemented.
 
 ---
 
-### Connecting and Using a Usage
+## Practices
+
+Practices form the documentation layer for consumers of a cell's API.
+
+They do not define entities. They describe how to work with the cell facade.
+
+---
+
+### Connecting and Using a Practice
 
 ```yaml
 Imports:
@@ -713,19 +698,17 @@ Annotations: |
   Use `usage_from_url` for implementation
 ```
 
-**IMPORTANT**: a usage receives a local reference name in the document that can be used in annotations, for example \`pattern\`.
+**IMPORTANT**: a practice receives a local reference name in the document that can be used in annotations, e.g., `pattern`.
 
-Usages are used inside annotations.
+Practices are referenced within annotations to convey:
 
-For example:
+- Instructions to use a specific library
+- References to a design pattern
+- Requirements to follow a specific structure
+- And so forth
 
-- an instruction to use a specific library
-- a reference to a pattern
-- a requirement to follow a specific structure
-- etc.
+In summary:
 
-Thus:
-
-- the DSL describes **what should exist**
-- usages define **how to use the cell's API**
-- annotations link these two levels
+- The DSL describes **what must exist**
+- Practices define **how to use the cell's API**
+- Annotations bind these two layers together
